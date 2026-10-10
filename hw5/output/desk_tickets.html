@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus Customs Ops Desk: Tickets</title>
+<style>
+  :root {
+    --bg: #0b0b0d;
+    --panel: #151518;
+    --panel-2: #1c1c21;
+    --line: #2b2b33;
+    --text: #f4f1f3;
+    --muted: #a39ca3;
+    --pink: #ff3d97;
+    --pink-soft: rgba(255, 61, 151, 0.14);
+    --ok: #7be0a4;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 28px 20px 64px; }
+
+  header { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+  header h1 { margin: 0; font-size: 1.5rem; letter-spacing: 0.01em; }
+  header h1 span { color: var(--pink); }
+  header p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+
+  .tabs {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 24px;
+  }
+  .tab {
+    appearance: none; background: none; border: 0; cursor: pointer;
+    color: var(--muted); font: inherit; font-weight: 600;
+    padding: 10px 16px; border-radius: 10px 10px 0 0;
+    border-bottom: 3px solid transparent;
+  }
+  .tab:hover { color: var(--text); }
+  .tab[aria-selected="true"] { color: var(--text); border-bottom-color: var(--pink); background: var(--pink-soft); }
+  .tab:focus-visible { outline: 2px solid var(--pink); outline-offset: 2px; }
+
+  .panel[hidden] { display: none; }
+
+  .summary {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--pink);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 26px;
+  }
+  .summary h2 { margin: 0 0 6px; font-size: 1.15rem; }
+  .summary p { margin: 0 0 12px; }
+  .facts { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .facts li {
+    background: var(--panel-2); border: 1px solid var(--line);
+    border-radius: 999px; padding: 3px 12px; font-size: 0.85rem; color: var(--muted);
+  }
+  .facts b { color: var(--text); font-weight: 600; }
+
+  section.block h3 {
+    margin: 0 0 10px; font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--pink);
+  }
+  section.block { margin-bottom: 30px; }
+
+  table.plan {
+    width: 100%; border-collapse: separate; border-spacing: 0;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+  }
+  table.plan th, table.plan td { padding: 14px 18px; vertical-align: top; text-align: left; }
+  table.plan th {
+    width: 190px; font-weight: 600; color: var(--muted); font-size: 0.9rem;
+    background: var(--panel-2);
+  }
+  table.plan tr + tr th, table.plan tr + tr td { border-top: 1px solid var(--line); }
+
+  ol.chain { margin: 0; padding: 0; list-style: none; counter-reset: step; }
+  ol.chain li { position: relative; padding: 0 0 12px 38px; counter-increment: step; }
+  ol.chain li:last-child { padding-bottom: 0; }
+  ol.chain li::before {
+    content: counter(step);
+    position: absolute; left: 0; top: 1px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--pink); color: #14000a; font-weight: 700; font-size: 0.82rem;
+    display: grid; place-items: center;
+  }
+  ol.chain li::after {
+    content: ""; position: absolute; left: 12px; top: 30px; bottom: 2px; width: 2px; background: var(--line);
+  }
+  ol.chain li:last-child::after { display: none; }
+  .agent { font-weight: 700; color: var(--text); }
+  .detail { color: var(--muted); }
+  .after { margin: 12px 0 0; color: var(--muted); }
+
+  .tools { display: flex; flex-wrap: wrap; gap: 6px; }
+  code.tool {
+    font: 0.82rem/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    background: var(--panel-2); border: 1px solid var(--line); color: var(--text);
+    border-radius: 6px; padding: 2px 8px;
+  }
+  .yes { color: var(--ok); font-weight: 700; }
+  .no { color: var(--text); font-weight: 700; }
+
+  .empty {
+    border: 1px dashed var(--line); border-radius: 12px; padding: 22px;
+    color: var(--muted); text-align: center; background: transparent;
+  }
+
+  .soon { text-align: center; padding: 56px 20px; }
+  .soon p { font-size: 1.2rem; margin: 0; }
+  .note { margin: 20px auto 0; max-width: 520px; text-align: left; }
+  .note .calc {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px;
+  }
+  .note .calc span { color: var(--muted); display: block; font-size: 0.82rem; margin-bottom: 2px; }
+  .note .calc strong { font-size: 1.05rem; }
+
+  @media (max-width: 640px) {
+    .wrap { padding: 20px 14px 48px; }
+    table.plan, table.plan tbody, table.plan tr, table.plan th, table.plan td { display: block; width: 100%; }
+    table.plan tr + tr th { border-top: 1px solid var(--line); }
+    table.plan tr + tr td { border-top: 0; }
+    .tab { padding: 9px 12px; font-size: 0.92rem; }
+  }
+
+  /* Actual section (Problem 9) */
+  .actual-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-bottom: 14px; font-size: 0.92rem; }
+  .actual-strip .stat { color: var(--muted); }
+  .actual-strip .stat b { color: var(--text); }
+  .status-pill { font: 700 0.74rem ui-monospace, Menlo, monospace; letter-spacing: 0.12em; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(123, 224, 164, 0.6); color: var(--ok); }
+  .agent-tools { display: grid; grid-template-columns: 130px 1fr; gap: 8px; align-items: start; padding: 4px 0; }
+  .agent-tools + .agent-tools { border-top: 1px solid var(--line); padding-top: 8px; }
+  .cmp-title { margin: 18px 0 8px; font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+  ul.compare { list-style: none; margin: 0 0 6px; padding: 0; display: grid; gap: 6px; }
+  ul.compare li { display: grid; grid-template-columns: 26px 1fr; gap: 8px; padding: 8px 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+  ul.compare .mark { font-weight: 700; }
+  ul.compare .same .mark { color: var(--ok); }
+  ul.compare .diff { border-color: rgba(255, 61, 151, 0.45); }
+  ul.compare .diff .mark { color: var(--pink); }
+  pre.reply { white-space: pre-wrap; font: inherit; margin: 0 0 6px; padding: 10px 12px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; }
+  .equation { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font: 700 1.15rem ui-monospace, Menlo, monospace; }
+  .equation .op { color: var(--pink); }
+  .equation .total { color: var(--ok); }
+  .equation .ok { font: 600 0.82rem -apple-system, system-ui, sans-serif; color: var(--ok); }
+  table.ledger { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  table.ledger th, table.ledger td { padding: 10px 14px; text-align: left; vertical-align: top; border-top: 1px solid var(--line); }
+  table.ledger thead th { background: var(--panel-2); color: var(--muted); font-size: 0.8rem; border-top: 0; }
+  table.ledger td.num { font-family: ui-monospace, Menlo, monospace; text-align: right; white-space: nowrap; }
+  table.ledger td.neg { color: var(--pink); }
+  .calc.plain { max-width: none; }
+  .summary h2 { color: var(--text); }
+  .summary p { margin-bottom: 10px; }
+  @media (max-width: 640px) { .agent-tools { grid-template-columns: 1fr; } table.ledger { font-size: 0.85rem; } }
+
+  /* Reflection tab (Problem 10) */
+  .reflection { max-width: 820px; }
+  .reflection-q h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: 0; text-transform: none; color: var(--text); }
+  .reflection-q p, .reflection-q li { margin: 0 0 10px; color: #e6e1e5; }
+  .reflection-q ul { margin: 0 0 10px; padding-left: 22px; }
+  .reflection-q { padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Campus Customs <span>Ops Desk</span></h1>
+    <p>Desk date: 2026-08-31 · Expected plan vs. the final run</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Desk views">
+    <button class="tab" role="tab" id="tab-101" aria-controls="panel-101" aria-selected="true">Ticket 101</button>
+    <button class="tab" role="tab" id="tab-102" aria-controls="panel-102" aria-selected="false" tabindex="-1">Ticket 102</button>
+    <button class="tab" role="tab" id="tab-103" aria-controls="panel-103" aria-selected="false" tabindex="-1">Ticket 103</button>
+    <button class="tab" role="tab" id="tab-cash" aria-controls="panel-cash" aria-selected="false" tabindex="-1">Cash</button>
+    <button class="tab" role="tab" id="tab-reflection" aria-controls="panel-reflection" aria-selected="false" tabindex="-1">Reflection</button>
+  </div>
+
+  <!-- Ticket 101 -->
+  <div class="panel" role="tabpanel" id="panel-101" aria-labelledby="tab-101">
+    <div class="summary">
+      <h2>Ticket 101 · Bulldog tee</h2>
+      <p>Tauhid Zaman wants a Bulldog tee in size S.</p>
+      <ul class="facts">
+        <li><b>Type</b> customer_order</li>
+        <li><b>SKU</b> CC-TEE-WHITE</li>
+        <li><b>Size</b> S</li>
+        <li><b>Qty</b> 1</li>
+        <li><b>Invoice</b> 501</li>
+        <li><b>Status</b> open → resolved</li>
+      </ul>
+    </div>
+
+    <section class="block">
+      <h3>Expected</h3>
+      <table class="plan">
+        <tr>
+          <th scope="row">Boss's first call and why</th>
+          <td>Boss first calls Inventory, because this is a customer order and the first question is whether we can fill it.</td>
+        </tr>
+        <tr>
+          <th scope="row">Delegation chain, in order</th>
+          <td>
+            <ol class="chain">
+              <li><span class="agent">Boss</span></li>
+              <li><span class="agent">Inventory</span> <span class="detail">(check_stock shows size S is at 0. list_vendors shows Bulldog Print Co reprints in 5 days)</span></li>
+              <li><span class="agent">Accounting</span> <span class="detail">(get_invoice shows the reprint invoice 501, $840, was due 08-28 and is 3 days overdue by the desk date. get_cash_balance shows $3,400, so it prepares the $840 payment)</span></li>
+              <li><span class="agent">back to Boss</span> <span class="detail">(list_pending_payments, then status awaiting_approval)</span></li>
+              <li><span class="agent">Customer Service</span> <span class="detail">(draft reply: S is out, the reprint is waiting on payment, other sizes are available now)</span></li>
+            </ol>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">MCP tools expected</th>
+          <td><div class="tools">
+            <code class="tool">get_ticket</code><code class="tool">get_desk_date</code><code class="tool">check_stock</code><code class="tool">list_vendors</code><code class="tool">get_invoice</code><code class="tool">get_cash_balance</code><code class="tool">prepare_payment</code><code class="tool">list_pending_payments</code><code class="tool">update_ticket_status</code><code class="tool">record_customer_reply</code>
+          </div></td>
+        </tr>
+        <tr>
+          <th scope="row">Human approval expected</th>
+          <td><span class="yes">Yes</span>, $840 to Bulldog Print Co. Nothing ships until it's paid.</td>
+        </tr>
+      </table>
+    </section>
+
+    <section class="block">
+      <h3>Actual</h3>
+      <div class="actual-strip">
+        <span class="status-pill status-resolved">FINAL STATUS: RESOLVED</span>
+        <span class="stat"><b>18</b> model requests</span>
+        <span class="stat"><b>27,065</b> tokens</span>
+        <span class="stat">Run <code class="tool">01a63e5fc065</code></span>
+      </div>
+      <table class="plan">
+        <tr><th scope="row">Boss's first call</th><td>Boss first called <b>Inventory</b>. Boss set <b>awaiting_approval</b>; it became <b>resolved</b> when payment #1 was approved.</td></tr>
+        <tr><th scope="row">Delegation chain, in order</th><td>
+          <ol class="chain"><li><span class="agent">Boss</span> <span class="detail">(started the run)</span></li><li><span class="agent">Boss → Inventory</span></li><li><span class="agent">Inventory → Accounting</span></li><li><span class="agent">Inventory → Customer Service</span></li></ol>
+          <p class="after">Reports back, in order: Accounting → Inventory, Customer Service → Inventory, Inventory → Boss. Then Boss called list_pending_payments and update_ticket_status.</p></td></tr>
+        <tr><th scope="row">MCP tools each agent called</th><td><div class="agent-tools"><span class="agent">Boss</span><div class="tools"><code class="tool">get_ticket</code><code class="tool">get_desk_date</code><code class="tool">list_pending_payments</code><code class="tool">update_ticket_status</code></div></div><div class="agent-tools"><span class="agent">Inventory</span><div class="tools"><code class="tool">check_stock</code><code class="tool">list_vendors</code></div></div><div class="agent-tools"><span class="agent">Accounting</span><div class="tools"><code class="tool">get_invoice</code><code class="tool">get_cash_balance</code><code class="tool">prepare_payment</code></div></div><div class="agent-tools"><span class="agent">Customer Service</span><div class="tools"><code class="tool">get_ticket</code><code class="tool">record_customer_reply</code></div></div></td></tr>
+        <tr><th scope="row">Requests and tokens</th><td><b>18</b> model requests and <b>27,065</b> tokens in all.<p class="after">By agent (requests / tokens): Boss 6 / 9,126, Inventory 5 / 6,839, Accounting 4 / 7,530, Customer Service 3 / 3,570.</p></td></tr>
+        <tr><th scope="row">Human approval</th><td><span class="yes">Yes</span>, $840.00 to Bulldog Print Co: payment #1 was prepared by Accounting and approved by <b>human (board)</b>. Invoice 501 is now paid and the ticket became resolved.</td></tr>
+        <tr><th scope="row">Customer draft reply</th><td><pre class="reply">Hi Tauhid,
+
+Size S is currently out of stock. We have 5 in M, 3 in L, and 2 in XL if you’d like to choose one of those instead.
+
+A size-S reprint is on hold because invoice 501 is still unpaid, and its payment request is pending approval. We can’t proceed with the reprint while the invoice is unpaid, so I can’t confirm a reprint date. The printer’s stated lead time is 5 days once a reprint can proceed.
+
+Please let us know whether you’d prefer an available size or would like to wait on the size-S reprint.
+
+Best,
+Yale Shop</pre><span class="detail">Saved as draft #1. Nothing was sent.</span></td></tr>
+      </table>
+      <h4 class="cmp-title">How the run compared with the plan</h4>
+      <ul class="compare"><li class="same"><span class="mark">✓</span>Boss first called Inventory, which found size S at 0 and Bulldog Print Co&#x27;s 5-day lead time.</li><li class="same"><span class="mark">✓</span>Accounting found invoice 501 ($840.00, due 08-28, 3 days overdue) and $3,400 in checking, and prepared the $840 payment.</li><li class="same"><span class="mark">✓</span>The ten tools called are exactly the ten expected. Human approval: $840 to Bulldog Print Co, approved on the board.</li><li class="same"><span class="mark">✓</span>The draft reply says S is out, the reprint is waiting on payment, and other sizes are available.</li><li class="diff"><span class="mark">≠</span>Customer Service was called by Inventory, not by Boss after the status change, so the draft was saved before Boss listed pending payments and set awaiting_approval.</li></ul>
+    </section>
+  </div>
+
+  <!-- Ticket 102 -->
+  <div class="panel" role="tabpanel" id="panel-102" aria-labelledby="tab-102" hidden>
+    <div class="summary">
+      <h2>Ticket 102 · Rent due</h2>
+      <p>Elm City Properties says rent is due.</p>
+      <ul class="facts">
+        <li><b>Type</b> rent_notice</li>
+        <li><b>Lease</b> 1 (Chapel Street shop)</li>
+        <li><b>Notice</b> shop rent due in 2 days</li>
+        <li><b>Status</b> open → resolved</li>
+      </ul>
+    </div>
+
+    <section class="block">
+      <h3>Expected</h3>
+      <table class="plan">
+        <tr>
+          <th scope="row">Boss's first call and why</th>
+          <td>Boss first calls Facilities, because the lease is facilities' job and the notice should be checked before any money moves.</td>
+        </tr>
+        <tr>
+          <th scope="row">Delegation chain, in order</th>
+          <td>
+            <ol class="chain">
+              <li><span class="agent">Boss</span></li>
+              <li><span class="agent">Facilities</span> <span class="detail">(get_lease confirms the same landlord, $2,400, due 09-02, which is 2 days from the desk date)</span></li>
+              <li><span class="agent">Accounting</span> <span class="detail">(get_cash_balance, then prepare_payment for $2,400)</span></li>
+              <li><span class="agent">back to Boss</span> <span class="detail">(list_pending_payments, awaiting_approval)</span></li>
+            </ol>
+            <p class="after">Inventory and Customer Service aren't needed.</p>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">MCP tools expected</th>
+          <td><div class="tools">
+            <code class="tool">get_ticket</code><code class="tool">get_desk_date</code><code class="tool">get_lease</code><code class="tool">get_cash_balance</code><code class="tool">prepare_payment</code><code class="tool">list_pending_payments</code><code class="tool">update_ticket_status</code>
+          </div></td>
+        </tr>
+        <tr>
+          <th scope="row">Human approval expected</th>
+          <td><span class="yes">Yes</span>, $2,400 to Elm City Properties.</td>
+        </tr>
+      </table>
+    </section>
+
+    <section class="block">
+      <h3>Actual</h3>
+      <div class="actual-strip">
+        <span class="status-pill status-resolved">FINAL STATUS: RESOLVED</span>
+        <span class="stat"><b>14</b> model requests</span>
+        <span class="stat"><b>17,985</b> tokens</span>
+        <span class="stat">Run <code class="tool">4cc7c3ef82c3</code></span>
+      </div>
+      <table class="plan">
+        <tr><th scope="row">Boss's first call</th><td>Boss first called <b>Facilities</b>. Boss set <b>awaiting_approval</b>; it became <b>resolved</b> when payment #2 was approved.</td></tr>
+        <tr><th scope="row">Delegation chain, in order</th><td>
+          <ol class="chain"><li><span class="agent">Boss</span> <span class="detail">(started the run)</span></li><li><span class="agent">Boss → Facilities</span></li><li><span class="agent">Facilities → Accounting</span></li></ol>
+          <p class="after">Reports back, in order: Accounting → Facilities, Facilities → Boss. Then Boss called list_pending_payments and update_ticket_status.</p></td></tr>
+        <tr><th scope="row">MCP tools each agent called</th><td><div class="agent-tools"><span class="agent">Boss</span><div class="tools"><code class="tool">get_ticket</code><code class="tool">get_desk_date</code><code class="tool">list_pending_payments</code><code class="tool">update_ticket_status</code></div></div><div class="agent-tools"><span class="agent">Facilities</span><div class="tools"><code class="tool">get_desk_date</code><code class="tool">get_lease</code></div></div><div class="agent-tools"><span class="agent">Accounting</span><div class="tools"><code class="tool">get_desk_date</code><code class="tool">get_cash_balance</code><code class="tool">prepare_payment</code></div></div></td></tr>
+        <tr><th scope="row">Requests and tokens</th><td><b>14</b> model requests and <b>17,985</b> tokens in all.<p class="after">By agent (requests / tokens): Boss 6 / 8,178, Facilities 4 / 3,734, Accounting 4 / 6,073.</p></td></tr>
+        <tr><th scope="row">Human approval</th><td><span class="yes">Yes</span>, $2,400.00 to Elm City Properties: payment #2 was prepared by Accounting and approved by <b>human (board)</b>. The rent is now paid and the ticket became resolved.</td></tr>
+        <tr><th scope="row">Customer draft reply</th><td>None. A rent notice does not need a customer reply.</td></tr>
+      </table>
+      <h4 class="cmp-title">How the run compared with the plan</h4>
+      <ul class="compare"><li class="same"><span class="mark">✓</span>Boss first called Facilities, which confirmed landlord, $2,400.00 and the 09-02 due date (2 days from the desk date).</li><li class="same"><span class="mark">✓</span>Accounting checked cash and prepared the $2,400 payment; then back to Boss for list_pending_payments and awaiting_approval.</li><li class="same"><span class="mark">✓</span>Exactly the seven expected tools. Inventory and Customer Service were not used. Human approval: $2,400 to Elm City Properties.</li></ul>
+    </section>
+  </div>
+
+  <!-- Ticket 103 -->
+  <div class="panel" role="tabpanel" id="panel-103" aria-labelledby="tab-103" hidden>
+    <div class="summary">
+      <h2>Ticket 103 · Bulk hoodie discount</h2>
+      <p>Yale AI Club wants 20 navy hoodies in size M at a bulk discount.</p>
+      <ul class="facts">
+        <li><b>Type</b> price_override</li>
+        <li><b>SKU</b> CC-HOOD-NAVY</li>
+        <li><b>Size</b> M</li>
+        <li><b>Qty</b> 20</li>
+        <li><b>Status</b> open → resolved</li>
+      </ul>
+    </div>
+
+    <section class="block">
+      <h3>Expected</h3>
+      <table class="plan">
+        <tr>
+          <th scope="row">Boss's first call and why</th>
+          <td>Boss first calls Accounting, because the request is about price and a discount is a money decision first.</td>
+        </tr>
+        <tr>
+          <th scope="row">Delegation chain, in order</th>
+          <td>
+            <ol class="chain">
+              <li><span class="agent">Boss</span></li>
+              <li><span class="agent">Accounting</span> <span class="detail">(get_pricing shows cost $22 and list $58, so at most 15% off is $49.30 each, $986 for 20, still well above cost)</span></li>
+              <li><span class="agent">Inventory</span> <span class="detail">(check_stock shows only 8 in size M, with L 14, XL 6, S 4)</span></li>
+              <li><span class="agent">back to Boss</span></li>
+              <li><span class="agent">Customer Service</span> <span class="detail">(draft offer: 8 in M now at $49.30, the rest in another size or after a restock)</span></li>
+            </ol>
+            <p class="after">No payment is expected, so the status should be resolved.</p>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">MCP tools expected</th>
+          <td><div class="tools">
+            <code class="tool">get_ticket</code><code class="tool">get_desk_date</code><code class="tool">get_pricing</code><code class="tool">check_stock</code><code class="tool">list_pending_payments</code><code class="tool">update_ticket_status</code><code class="tool">record_customer_reply</code>
+          </div></td>
+        </tr>
+        <tr>
+          <th scope="row">Human approval expected</th>
+          <td><span class="no">No</span>, unless the agents try a restock. Restocking 12 hoodies costs $264, but if 101 and 102 are paid first, only $160 is left, so I expect Accounting to flag that it can't cover it.</td>
+        </tr>
+      </table>
+    </section>
+
+    <section class="block">
+      <h3>Actual</h3>
+      <div class="actual-strip">
+        <span class="status-pill status-resolved">FINAL STATUS: RESOLVED</span>
+        <span class="stat"><b>16</b> model requests</span>
+        <span class="stat"><b>21,029</b> tokens</span>
+        <span class="stat">Run <code class="tool">1690588b0383</code></span>
+      </div>
+      <table class="plan">
+        <tr><th scope="row">Boss's first call</th><td>Boss first called <b>Accounting</b>. Boss set <b>resolved</b> directly.</td></tr>
+        <tr><th scope="row">Delegation chain, in order</th><td>
+          <ol class="chain"><li><span class="agent">Boss</span> <span class="detail">(started the run)</span></li><li><span class="agent">Boss → Accounting</span></li><li><span class="agent">Accounting → Inventory</span></li><li><span class="agent">Accounting → Customer Service</span></li></ol>
+          <p class="after">Reports back, in order: Inventory → Accounting, Customer Service → Accounting, Accounting → Boss. Then Boss called list_pending_payments and update_ticket_status.</p></td></tr>
+        <tr><th scope="row">MCP tools each agent called</th><td><div class="agent-tools"><span class="agent">Boss</span><div class="tools"><code class="tool">get_ticket</code><code class="tool">get_desk_date</code><code class="tool">list_pending_payments</code><code class="tool">update_ticket_status</code></div></div><div class="agent-tools"><span class="agent">Accounting</span><div class="tools"><code class="tool">get_pricing</code></div></div><div class="agent-tools"><span class="agent">Inventory</span><div class="tools"><code class="tool">check_stock</code><code class="tool">list_vendors</code></div></div><div class="agent-tools"><span class="agent">Customer Service</span><div class="tools"><code class="tool">get_ticket</code><code class="tool">record_customer_reply</code></div></div></td></tr>
+        <tr><th scope="row">Requests and tokens</th><td><b>16</b> model requests and <b>21,029</b> tokens in all.<p class="after">By agent (requests / tokens): Boss 6 / 8,504, Accounting 4 / 6,478, Inventory 3 / 2,851, Customer Service 3 / 3,196.</p></td></tr>
+        <tr><th scope="row">Human approval</th><td><span class="no">No</span>. No payment was prepared, so Boss resolved the ticket itself.</td></tr>
+        <tr><th scope="row">Customer draft reply</th><td><pre class="reply">Hi Yale AI Club,
+
+We can offer the 20 navy hoodies in size M at $49.30 each, for a total of $986. We have 8 in stock; the remaining 12 would need to be reprinted, with a 5-day lead time. Would you like to proceed?
+
+Best,
+Yale Shop</pre><span class="detail">Saved as draft #2. Nothing was sent.</span></td></tr>
+      </table>
+      <h4 class="cmp-title">How the run compared with the plan</h4>
+      <ul class="compare"><li class="same"><span class="mark">✓</span>Boss first called Accounting, which found cost $22 and list $58 and approved 15% off: $49.30 each, $986.00 for 20.</li><li class="same"><span class="mark">✓</span>Inventory found only 8 in size M. No payment was prepared, no restock was tried, no human approval was needed, and the status ended resolved.</li><li class="diff"><span class="mark">≠</span>Customer Service was called by Accounting, not by Boss after Inventory, and the work came back through Accounting to Boss.</li><li class="diff"><span class="mark">≠</span>Inventory also called list_vendors (5-day Bulldog Print Co reprint), which was not in the expected tool list.</li><li class="diff"><span class="mark">≠</span>The draft reply offers the 8 in stock plus a 5-day reprint for the other 12. It does not offer another size.</li></ul>
+    </section>
+  </div>
+
+  <!-- Cash -->
+  <div class="panel" role="tabpanel" id="panel-cash" aria-labelledby="tab-cash" hidden>
+    <div class="summary">
+      <h2>Actual · Checking balance</h2>
+      <p>Starting balance after the reset: <b>$3,400.00</b>. Ending balance, read from <code class="tool">cash_accounts</code> in <code class="tool">data/campus_customs_new.db</code>: <b>$160.00</b> (as of 2026-08-31).</p>
+      <div class="equation"><span>$3,400.00</span><span class="op">−</span><span>$840.00</span><span class="op">−</span><span>$2,400.00</span><span class="op">=</span><span class="total">$160.00</span><span class="ok">✓ equals the database balance</span></div>
+    </div>
+    <section class="block">
+      <h3>Expected, from the plan</h3>
+      <div class="calc plain">
+        <span>Expected cash</span>
+        <strong>$3,400 − $840 − $2,400 = $160 at the end.</strong>
+      </div>
+    </section>
+    <section class="block">
+      <h3>What changed, ticket by ticket</h3>
+      <table class="ledger">
+        <thead><tr><th>Ticket</th><th>What changed and why</th><th>Change</th><th>Balance after</th></tr></thead>
+        <tbody><tr><td>Start</td><td>Desk reset, checking balance</td><td class="num">—</td><td class="num">$3,400.00</td></tr><tr><td>Ticket 101</td><td><b>Approved payment #1</b><br><span class="detail">$840.00 to Bulldog Print Co for invoice 501 (3 days overdue, now marked paid).</span></td><td class="num neg">−$840.00</td><td class="num">$2,560.00</td></tr><tr><td>Ticket 102</td><td><b>Approved payment #2</b><br><span class="detail">$2,400.00 rent to Elm City Properties for lease 1 (due 2026-09-02).</span></td><td class="num neg">−$2,400.00</td><td class="num">$160.00</td></tr><tr><td>Ticket 103</td><td><b>No cash change</b><br><span class="detail">Discount only. The 15% bulk price was approved, but nothing was paid or received.</span></td><td class="num ">$0.00</td><td class="num">$160.00</td></tr></tbody>
+      </table>
+    </section>
+    <section class="block">
+      <h3>Rows in the payments table</h3>
+      <table class="ledger">
+        <thead><tr><th>id</th><th>kind</th><th>ref_id</th><th>amount</th><th>account</th><th>paid_at</th><th>approved_by</th></tr></thead>
+        <tbody><tr><td>1</td><td>invoice</td><td>501</td><td class="num">$840.00</td><td>checking</td><td>2026-08-31</td><td>human (board)</td></tr><tr><td>2</td><td>rent</td><td>1</td><td class="num">$2,400.00</td><td>checking</td><td>2026-08-31</td><td>human (board)</td></tr></tbody>
+      </table>
+    </section>
+  </div>
+
+  <!-- Reflection -->
+  <div class="panel" role="tabpanel" id="panel-reflection" aria-labelledby="tab-reflection" hidden>
+    <div class="reflection">
+      <section class="block reflection-q">
+        <h3>1. How did the agents do on each ticket?</h3>
+        <p>101 (tee, size S): Pretty good. Inventory caught that S was at 0 and offered M/L/XL. Accounting used the desk date to see invoice 501 was 3 days late and set up the $840 for me to approve. Two misses: the customer reply was written before I approved, so it tells Tauhid the reprint is still "on hold", and nobody actually ordered the reprint because there's no tool for it.</p><p>102 (rent): Best run. Facilities checked the notice against the lease ($2,400, due 9/2, 2 days out), Accounting set up the payment, I approved it. Only 14 requests and no wasted agents.</p><p>103 (20 hoodies for Yale AI Club): The discount math was right, $49.30 each, $986 total, still above the $22 cost. But Accounting never checked cash, and the reply promised to reprint the other 12. That's about $264 and we only had $160 left. It also didn't offer size L, which had 14 in stock.</p>
+      </section>
+      <section class="block reflection-q">
+        <h3>2. Actual vs. Expected</h3>
+        <p>101: Close, but Inventory handed the reply to Customer Service instead of Boss doing it at the end. That's why the reply went out too early.</p><p>102: Exactly what I planned.</p><p>103: I expected Accounting to flag the cash problem on a restock. It didn't check cash at all. Cash still ended at $160 like I planned, but only because no agent is able to buy anything.</p>
+      </section>
+      <section class="block reflection-q">
+        <h3>3. What would be simpler as one agent?</h3>
+        <p>Rent (102). It's just read the lease, check cash, set up the payment. One agent with three tools could do it in about 5 requests instead of 14. The team used 48 requests and about 66k tokens across all three tickets. The split only really paid off on 101, where stock, a late bill and a customer were all involved.</p>
+      </section>
+      <section class="block reflection-q">
+        <h3>4. Three problems this team can already handle</h3>
+        <ul><li>A customer wants the Crest Mug (0 in stock): check stock, find Elm City Gifts (3-day lead), reply honestly.</li><li>Another overdue vendor invoice: same flow as 101, prepared for a human to approve.</li><li>Another club wants a bulk deal on caps: 15% off $22 is $18.70, still well above the $6 cost.</li></ul>
+      </section>
+      <section class="block reflection-q">
+        <h3>5. Three problems it can't handle, and what I'd add</h3>
+        <ul><li>Actually ordering stock. No order tool, so the reprints in 101 and 103 never happened. Add a Procurement agent with a purchase-order tool that checks cash first.</li><li>Planning cash. We dropped to $160 and nothing warned us before promises were made. Add a Finance agent with a cash forecast.</li><li>Billing customers. Yale AI Club would owe $986 but we can't invoice them or record payment. Add a Sales agent with invoice and payment tools.</li></ul><p>Also: after rent was paid the lease still says due 9/2. Facilities needs a tool to roll it forward.</p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+    var ids = tabs.map(function (t) { return t.id.replace('tab-', ''); });
+
+    function show(id, focus) {
+      tabs.forEach(function (t) {
+        var on = t.id === 'tab-' + id;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+        if (on && focus) t.focus();
+      });
+      try { history.replaceState(null, '', '#' + id); } catch (e) {}
+    }
+
+    tabs.forEach(function (t, i) {
+      t.addEventListener('click', function () { show(ids[i]); });
+      t.addEventListener('keydown', function (e) {
+        var n = null;
+        if (e.key === 'ArrowRight') n = (i + 1) % tabs.length;
+        if (e.key === 'ArrowLeft') n = (i - 1 + tabs.length) % tabs.length;
+        if (e.key === 'Home') n = 0;
+        if (e.key === 'End') n = tabs.length - 1;
+        if (n !== null) { e.preventDefault(); show(ids[n], true); }
+      });
+    });
+
+    var start = location.hash.replace('#', '');
+    show(ids.indexOf(start) > -1 ? start : ids[0]);
+  })();
+</script>
+</body>
+</html>

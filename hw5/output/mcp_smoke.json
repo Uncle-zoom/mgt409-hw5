@@ -1,0 +1,17 @@
+[
+  {
+    "question": "Do we have the Classic Bulldog Tee in size S right now?",
+    "tool": "check_stock",
+    "raw_output": "{\n  \"found\": true,\n  \"sku\": \"CC-TEE-WHITE\",\n  \"name\": \"Classic Bulldog Tee\",\n  \"size\": \"S\",\n  \"qty\": 0,\n  \"location\": \"Aisle B\",\n  \"other_sizes\": [\n    {\n      \"size\": \"M\",\n      \"qty\": 5,\n      \"location\": \"Aisle B\"\n    },\n    {\n      \"size\": \"L\",\n      \"qty\": 3,\n      \"location\": \"Aisle B\"\n    },\n    {\n      \"size\": \"XL\",\n      \"qty\": 2,\n      \"location\": \"Aisle B\"\n    }\n  ]\n}"
+  },
+  {
+    "question": "When is rent due on the Chapel Street shop and how many days do we have?",
+    "tool": "get_lease",
+    "raw_output": "{\n  \"found\": true,\n  \"lease\": {\n    \"id\": 1,\n    \"space_name\": \"Chapel Street shop\",\n    \"landlord\": \"Elm City Properties\",\n    \"monthly_rent\": 2400.0,\n    \"next_due\": \"2026-09-02\",\n    \"notes\": null\n  },\n  \"date_today\": \"2026-08-31\",\n  \"days_until_due\": 2\n}"
+  },
+  {
+    "question": "What's our cost and list price on the navy hoodie?",
+    "tool": "get_pricing",
+    "raw_output": "{\n  \"found\": true,\n  \"sku\": \"CC-HOOD-NAVY\",\n  \"unit_cost\": 22.0,\n  \"list_price\": 58.0,\n  \"margin_per_unit\": 36.0\n}"
+  }
+]

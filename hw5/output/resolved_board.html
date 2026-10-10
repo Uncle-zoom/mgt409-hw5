@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus Customs Resolved Board</title>
+<style>
+  :root {
+    --bg: #0a0a0c; --panel: #111116; --panel-2: #17171d; --line: #26262f;
+    --text: #f4f1f3; --muted: #9b949d; --pink: #ff3d97; --green: #3ee59a; --yellow: #ffe14d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; color: var(--text); min-height: 100vh;
+    background: radial-gradient(900px 500px at 8% -8%, rgba(255, 61, 151, 0.13), transparent 60%), var(--bg);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 20px 64px; }
+  header { margin-bottom: 26px; padding-bottom: 18px; position: relative; }
+  header::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 6px; border-radius: 3px;
+    background: repeating-linear-gradient(-45deg, var(--pink) 0 10px, #0a0a0c 10px 20px); opacity: 0.85;
+  }
+  h1 { margin: 0 0 6px; font-size: 1.6rem; letter-spacing: 0.02em; text-transform: uppercase; }
+  h1 span { color: var(--pink); }
+  header p { margin: 0; color: var(--muted); }
+  .totals { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 14px; font-size: 0.92rem; color: var(--muted); }
+  .totals b { color: var(--text); }
+  .totals .ok { color: var(--green); }
+  figure {
+    margin: 0 0 30px; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 14px; overflow: hidden;
+  }
+  figure a { display: block; background: #000; }
+  figure img { display: block; width: 100%; height: auto; }
+  figcaption { padding: 16px 20px 18px; border-top: 1px solid var(--line); }
+  figcaption h2 { margin: 0 0 6px; font-size: 1rem; letter-spacing: 0.04em; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .pill {
+    font: 700 0.72rem ui-monospace, Menlo, monospace; letter-spacing: 0.12em;
+    padding: 3px 9px; border-radius: 6px; border: 1px solid rgba(62, 229, 154, 0.6); color: var(--green);
+  }
+  figcaption p { margin: 0; color: #cfc8cf; }
+  figcaption .meta { margin-top: 8px; color: var(--muted); font-size: 0.88rem; }
+  @media (max-width: 640px) { .wrap { padding: 20px 14px 48px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Campus Customs <span>Resolved Board</span></h1>
+    <p>The dashboard right after each of the three final runs. Click a screenshot to open it full size.</p>
+    <div class="totals">
+      <span>Checking: <b>$3,400.00</b> at the start, <b>$160.00</b> at the end</span>
+      <span class="ok">✓ 3,400 − 840 − 2,400 = 160.00</span>
+      <span>All three tickets: <b>RESOLVED</b></span>
+    </div>
+  </header>
+
+  <figure>
+    <a href="resolved_board_images/ticket_101.png"><img src="resolved_board_images/ticket_101.png" alt="Dashboard after ticket 101: run complete, status RESOLVED, checking balance $2,560.00" loading="lazy"></a>
+    <figcaption>
+      <h2>Ticket 101 · Bulldog tee, size S <span class="pill">RESOLVED</span></h2>
+      <p>Size S is out of stock, so Inventory looked at the other sizes and the vendor, Accounting prepared the $840.00 payment for overdue invoice 501, and Customer Service saved a draft reply. After the human approval, checking dropped to $2,560.00.</p>
+      <p class="meta">Run 01a63e5fc065 · Boss → Inventory → Accounting, and Inventory → Customer Service · 18 model requests · 27,065 tokens</p>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <a href="resolved_board_images/ticket_102.png"><img src="resolved_board_images/ticket_102.png" alt="Dashboard after ticket 102: run complete, status RESOLVED, checking balance $160.00, nothing waiting for approval" loading="lazy"></a>
+    <figcaption>
+      <h2>Ticket 102 · Rent due <span class="pill">RESOLVED</span></h2>
+      <p>Facilities matched the notice to lease 1 and Accounting prepared the $2,400.00 rent payment. After the human approval, checking is $160.00 and nothing is waiting for approval.</p>
+      <p class="meta">Run 4cc7c3ef82c3 · Boss → Facilities → Accounting · 14 model requests · 17,985 tokens</p>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <a href="resolved_board_images/ticket_103.png"><img src="resolved_board_images/ticket_103.png" alt="Dashboard after ticket 103: run complete, status RESOLVED, no approval needed, checking balance $160.00" loading="lazy"></a>
+    <figcaption>
+      <h2>Ticket 103 · Bulk hoodie discount <span class="pill">RESOLVED</span></h2>
+      <p>Accounting approved a 15% bulk price of $49.30 each, Inventory found only 8 of the 20 in stock, and Customer Service saved a draft offer. No payment was needed, so checking stays at $160.00.</p>
+      <p class="meta">Run 1690588b0383 · Boss → Accounting → Inventory, and Accounting → Customer Service · 16 model requests · 21,029 tokens</p>
+    </figcaption>
+  </figure>
+</div>
+</body>
+</html>

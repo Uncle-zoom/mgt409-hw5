@@ -1,0 +1,243 @@
+{
+  "source": {
+    "runs": {
+      "101": "01a63e5fc065",
+      "102": "4cc7c3ef82c3",
+      "103": "1690588b0383"
+    },
+    "audit_trail": "output/audit_trail.json (only these three runs)",
+    "database": "data/campus_customs_new.db (read-only; the original data/campus_customs.db is untouched)"
+  },
+  "cash": {
+    "starting_checking": 3400.0,
+    "ending_checking": 160.0,
+    "as_of": "2026-08-31",
+    "check": "3400 - 840 - 2400 = 160.00",
+    "matches_cash_accounts": true
+  },
+  "tickets": [
+    {
+      "id": 101,
+      "type": "customer_order",
+      "subject": "Bulldog tee",
+      "run_id": "01a63e5fc065",
+      "final_status": "resolved",
+      "outcome": "Size S is out of stock (0), with M/L/XL at 5/3/2. Accounting prepared the $840.00 payment for overdue invoice 501; it was approved by a human, the invoice is now paid and the ticket is resolved. A draft reply offering the other sizes was saved (not sent). The database records no reprint order.",
+      "agents_in_order": [
+        "Boss",
+        "Inventory",
+        "Accounting",
+        "Customer Service"
+      ],
+      "delegations_in_order": [
+        "Boss -> Inventory",
+        "Inventory -> Accounting",
+        "Inventory -> Customer Service"
+      ],
+      "agent_contributions": [
+        {
+          "agent": "Boss",
+          "contribution": "Read ticket 101 and the desk date, handed it to Inventory, then listed pending payments and set the ticket to awaiting_approval.",
+          "mcp_tools_called": {
+            "get_ticket": 1,
+            "get_desk_date": 1,
+            "list_pending_payments": 1,
+            "update_ticket_status": 1
+          },
+          "model_requests": 6,
+          "tokens": 9126
+        },
+        {
+          "agent": "Inventory",
+          "contribution": "check_stock: size S of CC-TEE-WHITE is at 0 (M 5, L 3, XL 2). list_vendors: Bulldog Print Co reprints apparel in 5 days. Handed the invoice question to Accounting and the customer reply to Customer Service.",
+          "mcp_tools_called": {
+            "check_stock": 1,
+            "list_vendors": 1
+          },
+          "model_requests": 5,
+          "tokens": 6839
+        },
+        {
+          "agent": "Accounting",
+          "contribution": "get_invoice: invoice 501 is $840.00 to Bulldog Print Co, due 2026-08-28, 3 days overdue. get_cash_balance showed checking could cover it, so it prepared pending payment #1 for $840.00. Nothing was paid by the agent.",
+          "mcp_tools_called": {
+            "get_invoice": 1,
+            "get_cash_balance": 1,
+            "prepare_payment": 1
+          },
+          "model_requests": 4,
+          "tokens": 7530
+        },
+        {
+          "agent": "Customer Service",
+          "contribution": "Read the ticket and saved draft reply #1: size S is out, M/L/XL are available, the size-S reprint is on hold while invoice 501 is unpaid. Not sent.",
+          "mcp_tools_called": {
+            "get_ticket": 1,
+            "record_customer_reply": 1
+          },
+          "model_requests": 3,
+          "tokens": 3570
+        }
+      ],
+      "model_requests": 18,
+      "tokens": 27065,
+      "human_approvals": [
+        {
+          "payment_id": 1,
+          "payee": "Bulldog Print Co",
+          "amount": 840.0,
+          "kind": "invoice",
+          "ref_id": 501,
+          "prepared_by": "accounting",
+          "approved_by": "human (board)",
+          "paid_at": "2026-08-31"
+        }
+      ],
+      "cash_change": -840.0,
+      "customer_draft_reply": {
+        "reply_id": 1,
+        "status": "draft",
+        "message": "Hi Tauhid,\n\nSize S is currently out of stock. We have 5 in M, 3 in L, and 2 in XL if you’d like to choose one of those instead.\n\nA size-S reprint is on hold because invoice 501 is still unpaid, and its payment request is pending approval. We can’t proceed with the reprint while the invoice is unpaid, so I can’t confirm a reprint date. The printer’s stated lead time is 5 days once a reprint can proceed.\n\nPlease let us know whether you’d prefer an available size or would like to wait on the size-S reprint.\n\nBest,\nYale Shop"
+      }
+    },
+    {
+      "id": 102,
+      "type": "rent_notice",
+      "subject": "Rent due",
+      "run_id": "4cc7c3ef82c3",
+      "final_status": "resolved",
+      "outcome": "The rent notice matched lease 1 ($2,400.00 due 2026-09-02). Accounting prepared the payment, a human approved it, and the ticket is resolved. No customer reply was needed.",
+      "agents_in_order": [
+        "Boss",
+        "Facilities",
+        "Accounting"
+      ],
+      "delegations_in_order": [
+        "Boss -> Facilities",
+        "Facilities -> Accounting"
+      ],
+      "agent_contributions": [
+        {
+          "agent": "Boss",
+          "contribution": "Read ticket 102 and the desk date, handed it to Facilities, then listed pending payments and set the ticket to awaiting_approval.",
+          "mcp_tools_called": {
+            "get_ticket": 1,
+            "get_desk_date": 1,
+            "list_pending_payments": 1,
+            "update_ticket_status": 1
+          },
+          "model_requests": 6,
+          "tokens": 8178
+        },
+        {
+          "agent": "Facilities",
+          "contribution": "get_lease: lease 1 (Chapel Street shop) landlord matches Elm City Properties, rent $2,400.00, due 2026-09-02, which is 2 days after the desk date. Handed the payment to Accounting.",
+          "mcp_tools_called": {
+            "get_desk_date": 1,
+            "get_lease": 1
+          },
+          "model_requests": 4,
+          "tokens": 3734
+        },
+        {
+          "agent": "Accounting",
+          "contribution": "Checked the cash balance and prepared pending payment #2 for $2,400.00 to Elm City Properties (lease 1). Nothing was paid by the agent.",
+          "mcp_tools_called": {
+            "get_desk_date": 1,
+            "get_cash_balance": 1,
+            "prepare_payment": 1
+          },
+          "model_requests": 4,
+          "tokens": 6073
+        }
+      ],
+      "model_requests": 14,
+      "tokens": 17985,
+      "human_approvals": [
+        {
+          "payment_id": 2,
+          "payee": "Elm City Properties",
+          "amount": 2400.0,
+          "kind": "rent",
+          "ref_id": 1,
+          "prepared_by": "accounting",
+          "approved_by": "human (board)",
+          "paid_at": "2026-08-31"
+        }
+      ],
+      "cash_change": -2400.0,
+      "customer_draft_reply": null
+    },
+    {
+      "id": 103,
+      "type": "price_override",
+      "subject": "Bulk hoodie discount",
+      "run_id": "1690588b0383",
+      "final_status": "resolved",
+      "outcome": "Accounting approved a 15% bulk discount ($49.30 each, $986.00 for 20, above the $22.00 cost). Only 8 of 20 size M hoodies are in stock; the other 12 would need a 5-day reprint. A draft reply was saved (not sent). No payment was needed, so Boss resolved it with no human approval.",
+      "agents_in_order": [
+        "Boss",
+        "Accounting",
+        "Inventory",
+        "Customer Service"
+      ],
+      "delegations_in_order": [
+        "Boss -> Accounting",
+        "Accounting -> Inventory",
+        "Accounting -> Customer Service"
+      ],
+      "agent_contributions": [
+        {
+          "agent": "Boss",
+          "contribution": "Read ticket 103 and the desk date, handed it to Accounting, then listed pending payments (none) and set the ticket to resolved.",
+          "mcp_tools_called": {
+            "get_ticket": 1,
+            "get_desk_date": 1,
+            "list_pending_payments": 1,
+            "update_ticket_status": 1
+          },
+          "model_requests": 6,
+          "tokens": 8504
+        },
+        {
+          "agent": "Accounting",
+          "contribution": "get_pricing: CC-HOOD-NAVY costs $22.00 and lists at $58.00. Approved the 15% bulk discount: $49.30 each, $986.00 for 20, above cost. Asked Inventory about stock and Customer Service for the reply. Prepared no payment.",
+          "mcp_tools_called": {
+            "get_pricing": 1
+          },
+          "model_requests": 4,
+          "tokens": 6478
+        },
+        {
+          "agent": "Inventory",
+          "contribution": "check_stock: only 8 in size M, so 12 short. list_vendors: Bulldog Print Co reprints apparel in 5 days.",
+          "mcp_tools_called": {
+            "check_stock": 1,
+            "list_vendors": 1
+          },
+          "model_requests": 3,
+          "tokens": 2851
+        },
+        {
+          "agent": "Customer Service",
+          "contribution": "Read the ticket and saved draft reply #2: 20 hoodies at $49.30 ($986 total), 8 in stock, the other 12 need a 5-day reprint. Not sent.",
+          "mcp_tools_called": {
+            "get_ticket": 1,
+            "record_customer_reply": 1
+          },
+          "model_requests": 3,
+          "tokens": 3196
+        }
+      ],
+      "model_requests": 16,
+      "tokens": 21029,
+      "human_approvals": [],
+      "cash_change": 0.0,
+      "customer_draft_reply": {
+        "reply_id": 2,
+        "status": "draft",
+        "message": "Hi Yale AI Club,\n\nWe can offer the 20 navy hoodies in size M at $49.30 each, for a total of $986. We have 8 in stock; the remaining 12 would need to be reprinted, with a 5-day lead time. Would you like to proceed?\n\nBest,\nYale Shop"
+      }
+    }
+  ]
+}
